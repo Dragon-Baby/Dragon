@@ -10,6 +10,11 @@ workspace "Dragon"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+IncludeDir = {}
+IncludeDir["GLFW"] = "Dragon/vendor/GLFW/include"
+
+include "Dragon/vendor/GLFW"
+
 project "Dragon"
     location "Dragon"
     kind "SharedLib"
@@ -17,6 +22,9 @@ project "Dragon"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+    pchheader "dgpch.h"
+    pchsource "Dragon/src/dgpch.cpp"
 
     files
     {
@@ -26,24 +34,29 @@ project "Dragon"
 
     includedirs
     {
-      "%{prj.name}/vender/spdlog/include"
+        "%{prj.name}/src",
+        "%{prj.name}/vendor/spdlog/include",
+        "%{IncludeDir.GLFW}"
     }
+
+    links
+    {
+        "GLFW",
+        "opengl32.lib"
+	}
 
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
 
-    defines
-    {
-        "DG_PLATFORM_WINDOWS",
-        "DG_BUILD_DLL"
-    }
+        defines
+        {
+            "DG_PLATFORM_WINDOWS",
+            "DG_BUILD_DLL"
+        }
 
-    postbuildcommands
-    {
-       ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
-    }
+    
 
     filter "configurations:Debug"
         defines "DG_DEBUG"
@@ -73,7 +86,7 @@ project "Sandbox"
 
     includedirs
     {
-        "Dragon/vender/spdlog/include",
+        "Dragon/vendor/spdlog/include",
         "Dragon/src"
     }
 
@@ -87,10 +100,12 @@ project "Sandbox"
         staticruntime "On"
         systemversion "latest"
 
-    defines
-    {
-        "DG_PLATFORM_WINDOWS"
-    }
+        defines
+        {
+            "DG_PLATFORM_WINDOWS"
+        }
+
+       
 
     filter "configurations:Debug"
         defines "DG_DEBUG"

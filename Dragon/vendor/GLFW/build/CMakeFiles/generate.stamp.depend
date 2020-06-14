@@ -1,0 +1,34 @@
+# CMake generation dependency list for this directory.
+D:/OpenGL_Library/glfw-3.3.2/CMakeLists.txt
+D:/OpenGL_Library/glfw-3.3.2/build/CMakeFiles/3.17.1/CMakeCCompiler.cmake
+D:/OpenGL_Library/glfw-3.3.2/build/CMakeFiles/3.17.1/CMakeRCCompiler.cmake
+D:/OpenGL_Library/glfw-3.3.2/build/CMakeFiles/3.17.1/CMakeSystem.cmake
+D:/OpenGL_Library/glfw-3.3.2/cmake_uninstall.cmake.in
+D:/OpenGL_Library/glfw-3.3.2/src/glfw3.pc.in
+D:/OpenGL_Library/glfw-3.3.2/src/glfw3Config.cmake.in
+D:/OpenGL_Library/glfw-3.3.2/src/glfw_config.h.in
+D:/Program Files/CMake/share/cmake-3.17/Modules/BasicConfigVersion-SameMajorVersion.cmake.in
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeCInformation.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeCommonLanguageInclude.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeDependentOption.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeGenericSystem.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeInitializeConfigs.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeLanguageInformation.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakePackageConfigHelpers.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeRCInformation.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeSystemSpecificInformation.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CMakeSystemSpecificInitialize.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CheckCSourceCompiles.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CheckIncludeFile.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/CheckLibraryExists.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/Compiler/MSVC-C.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/FindDoxygen.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/FindPackageHandleStandardArgs.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/FindPackageMessage.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/FindThreads.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/GNUInstallDirs.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/Platform/Windows-MSVC-C.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/Platform/Windows-MSVC.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/Platform/Windows.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/Platform/WindowsPaths.cmake
+D:/Program Files/CMake/share/cmake-3.17/Modules/WriteBasicConfigVersionFile.cmake

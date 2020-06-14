@@ -1,0 +1,5 @@
+﻿  Building Custom Rule D:/OpenGL_Library/glfw-3.3.2/examples/CMakeLists.txt
+  offscreen.c
+  glad_gl.c
+  正在生成代码...
+  offscreen.vcxproj -> D:\OpenGL_Library\glfw-3.3.2\build\examples\Debug\offscreen.exe

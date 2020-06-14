@@ -1,0 +1,44 @@
+﻿cl : 命令行 warning D9002: 忽略未知选项“-srd=c11”
+cl : 命令行 warning D9002: 忽略未知选项“-lgdi32”
+  context.c
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\context.c(407,10): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  egl_context.c
+  init.c
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(120,5): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(173,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(175,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(177,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(179,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(181,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(183,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(185,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(187,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(189,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(191,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(193,13): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\init.c(213,5): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  input.c
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\input.c(441,5): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  monitor.c
+  osmesa_context.c
+  vulkan.c
+  wgl_context.c
+  win32_init.c
+  win32_joystick.c
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\win32_joystick.c(455,9): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\win32_joystick.c(463,9): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\win32_joystick.c(559,13): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\win32_joystick.c(750,9): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\win32_joystick.c(751,9): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  win32_monitor.c
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\win32_monitor.c(104,5): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\win32_monitor.c(113,9): warning C4996: 'wcscpy': This function or variable may be unsafe. Consider using wcscpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  win32_thread.c
+  win32_time.c
+  win32_window.c
+  window.c
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\window.c(425,13): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\window.c(429,13): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+E:\DragonEngine\Dragon\Dragon\vendor\GLFW\src\window.c(433,13): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  正在生成代码...
+  GLFW.vcxproj -> E:\DragonEngine\Dragon\Dragon\vendor\GLFW\bin\Debug-windows-x86_64\GLFW\GLFW.lib

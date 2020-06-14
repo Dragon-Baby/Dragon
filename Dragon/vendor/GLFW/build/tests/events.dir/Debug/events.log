@@ -1,0 +1,6 @@
+﻿  Building Custom Rule D:/OpenGL_Library/glfw-3.3.2/tests/CMakeLists.txt
+  events.c
+  getopt.c
+  glad_gl.c
+  正在生成代码...
+  events.vcxproj -> D:\OpenGL_Library\glfw-3.3.2\build\tests\Debug\events.exe
