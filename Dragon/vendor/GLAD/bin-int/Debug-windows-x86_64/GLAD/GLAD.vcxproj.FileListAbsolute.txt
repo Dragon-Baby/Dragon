@@ -1,0 +1,2 @@
+E:\DragonEngine\Dragon\Dragon\vendor\GLAD\bin\Debug-windows-x86_64\GLAD\GLAD.pdb
+E:\DragonEngine\Dragon\Dragon\vendor\GLAD\bin-int\Debug-windows-x86_64\GLAD\GLAD.pdb

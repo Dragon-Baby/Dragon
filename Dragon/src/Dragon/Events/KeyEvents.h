@@ -43,7 +43,7 @@ namespace Dragon
 		KeyReleasedEvent(int keycode)
 			: KeyEvent(keycode){}
 
-		std:string ToString() const override
+		std::string ToString() const override
 		{
 			std::stringstream ss;
 			ss << "KeyReleaseEvent: " << m_KeyCode;

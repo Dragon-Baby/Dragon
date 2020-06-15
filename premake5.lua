@@ -12,8 +12,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["GLFW"] = "Dragon/vendor/GLFW/include"
+IncludeDir["GLAD"] = "Dragon/vendor/GLAD/include"
+IncludeDir["ImGui"] = "Dragon/vendor/ImGui"
 
 include "Dragon/vendor/GLFW"
+include "Dragon/vendor/GLAD"
+include "Dragon/vendor/ImGui"
 
 project "Dragon"
     location "Dragon"
@@ -36,12 +40,16 @@ project "Dragon"
     {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.GLAD}",
+        "%{IncludeDir.ImGui}"
     }
 
     links
     {
         "GLFW",
+        "GLAD",
+        "ImGui",
         "opengl32.lib"
 	}
 
@@ -53,21 +61,28 @@ project "Dragon"
         defines
         {
             "DG_PLATFORM_WINDOWS",
-            "DG_BUILD_DLL"
+            "DG_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
         }
 
-    
+        postbuildcommands
+        {
+            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" ..outputdir .. "/Sandbox")  
+		}
 
     filter "configurations:Debug"
         defines "DG_DEBUG"
+        buildoptions "/MDd"
         symbols "On"
 
     filter "configurations:Release"
         defines "DG_RELEASE"
+        buildoptions "/MD"
         optimize "On"
 
     filter "configurations:Dist"
         defines "DG_DIST"
+        buildoptions "/MD"
         optimize "On"
 
 project "Sandbox"
@@ -109,12 +124,15 @@ project "Sandbox"
 
     filter "configurations:Debug"
         defines "DG_DEBUG"
+        buildoptions "/MDd"
         symbols "On"
 
     filter "configurations:Release"
         defines "DG_RELEASE"
+        buildoptions "/MD"
         optimize "On"
 
     filter "configurations:Dist"
         defines "DG_DIST"
+        buildoptions "/MD"
         optimize "On"
