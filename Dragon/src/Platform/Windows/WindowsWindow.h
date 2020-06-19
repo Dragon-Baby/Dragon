@@ -4,6 +4,8 @@
 
 #include <GLFW/glfw3.h>
 
+#include "Dragon/Renderer/GraphicsContext.h"
+
 namespace Dragon
 {
 	class WindowsWindow : public Window
@@ -27,6 +29,7 @@ namespace Dragon
 		virtual void Shutdown();
 	private:
 		GLFWwindow* m_Window;
+		GraphicsContext* m_Context;
 		struct WindowData
 		{
 			std::string Title;

@@ -13,8 +13,7 @@ public:
 
 	void OnUpdate() override
 	{
-		if (Dragon::Input::IsKeyPressed(DG_KEY_TAB))
-			DG_TRACE("Tab key is pressed (poll)!");
+		
 	}
 
 

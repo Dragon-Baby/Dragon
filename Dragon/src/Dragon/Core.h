@@ -1,11 +1,15 @@
 #pragma once
 
 #ifdef DG_PLATFORM_WINDOWS
+#if DG_DYNAMIC_LINK
 	#ifdef  DG_BUILD_DLL
 		#define DRAGON_API __declspec(dllexport)
 	#else
 		#define DRAGON_API __declspec(dllimport)
 	#endif
+#else
+	#define DRAGON_API
+#endif
 #else
 	#error Dragon only supports Windows!
 #endif
