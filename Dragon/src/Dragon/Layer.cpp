@@ -9,8 +9,4 @@ namespace Dragon
 
 	}
 
-	Layer::~Layer()
-	{
-
-	}
 }

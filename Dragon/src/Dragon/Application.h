@@ -12,6 +12,7 @@
 #include "Dragon/Renderer/Shader.h"
 #include "Dragon/Renderer/Buffer.h"
 #include "Dragon/Renderer/VertexArray.h"
+#include "Dragon/Renderer/OrthographicCamera.h"
 
 
 namespace Dragon
@@ -40,8 +41,6 @@ namespace Dragon
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 
-		std::unique_ptr<Shader> m_Shader;
-		std::unique_ptr<VertexArray>m_VertexArray;
 	private:
 		static Application* s_Instance;
 	};
