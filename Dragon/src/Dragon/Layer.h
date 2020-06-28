@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Dragon/Core.h"
+#include "Dragon/Core/Timestep.h"
 #include "Dragon/Events/Event.h"
 
 namespace Dragon
@@ -13,7 +14,7 @@ namespace Dragon
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep ts) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event){}
 

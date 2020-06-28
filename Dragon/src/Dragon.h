@@ -9,14 +9,20 @@
 #include "Dragon/Layer.h"
 #include "Dragon/Log.h"
 #include "Dragon/ImGui/ImGuiLayer.h"
+#include "Dragon/Core/Timestep.h"
 
 // ---Renderer--------------------------
 #include "Dragon/Renderer/Renderer.h"
 #include "Dragon/Renderer/RenderCommand.h"
+
+#include "Dragon/Renderer/Camera.h"
+
 #include "Dragon/Renderer/Buffer.h"
 #include "Dragon/Renderer/Shader.h"
+#include "Dragon/Renderer/Texture.h"
 #include "Dragon/Renderer/VertexArray.h"
-#include "Dragon/Renderer/OrthographicCamera.h"
+
+//#include "Dragon/Renderer/OrthographicCamera.h"
 //---------------------------------------
 
 // ---Entry Point -----------------------

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "dgpch.h"
 #include "Dragon/Renderer/Buffer.h"
 
 

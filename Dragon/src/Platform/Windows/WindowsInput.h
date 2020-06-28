@@ -8,6 +8,7 @@ namespace Dragon
 	{
 	protected:
 		virtual bool IsKeyPressedImpl(int keycode) override;
+
 		virtual bool IsMouseButtonImpl(int button) override;
 		virtual std::pair<float, float> GetMousePositionImpl() override;
 		virtual float GetMouseXImpl() override;

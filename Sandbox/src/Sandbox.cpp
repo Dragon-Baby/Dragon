@@ -1,88 +1,73 @@
 #include <Dragon.h>
 
+#include "Platform/OpenGL/OpenGLShader.h"
+
 #include "ImGui/imgui.h"
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 class ExampleLayer : public Dragon::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example"), m_Camera(-1.0f, 1.0f, -1.0f, 1.0f), m_CameraPosition(0.0f)
+		: Layer("Example")
 	{
-		m_VertexArray.reset(Dragon::VertexArray::Create());
+		camera.SetPosition(glm::vec3(0, 0, 1.0));
 
+		m_VertexArray.reset(Dragon::VertexArray::Create());
 		float vertices[3 * 6] = {
-			-0.5f, -0.5f, 0.0f,1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.0f,  0.5f, 0.0f, 0.5f, 1.0f
 		};
 
 		std::shared_ptr<Dragon::VertexBuffer> vertexBuffer;
 		vertexBuffer.reset(Dragon::VertexBuffer::Create(vertices, sizeof(vertices)));
-
 		Dragon::BufferLayout layout = {
 			{Dragon::ShaderDataType::Float3, "a_Position"},
-			{Dragon::ShaderDataType::Float3, "a_Color"}
+			{Dragon::ShaderDataType::Float2, "a_TexCoord"}
 		};
 
 		vertexBuffer->SetLayout(layout);
+
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 
 		uint32_t indices[3] = { 0,1,2 };
 		std::shared_ptr<Dragon::IndexBuffer> indexBuffer;
 		indexBuffer.reset(Dragon::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
-		std::string vertexSrc = R"(
-			#version 330 core
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec3 a_Color;
+		auto textureShader = m_ShaderLibrary.Load("assets/shaders/texture.glsl");
 
-			uniform mat4 u_ViewPorjection;
-			
-			out vec3 v_Position;
-			out vec3 v_Color;
-			void main()
-			{
-				v_Position = a_Position;
-				v_Color = a_Color;
-				gl_Position = u_ViewPorjection * vec4(a_Position, 1.0);
-			}
+		m_Texture = Dragon::Texture2D::Create("assets/textures/wall.jpg");
 
-		)";
-
-		std::string fragmentSrc = R"(
-			#version 330 core
-			out vec4 color;
-
-			in vec3 v_Position;
-			in vec3 v_Color;
-			void main()
-			{
-				color = vec4(v_Color, 1.0);
-			}
-
-		)";
-
-		m_Shader.reset(new Dragon::Shader(vertexSrc, fragmentSrc));
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Dragon::Timestep ts) override
 	{
-
-
-		Dragon::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Dragon::RenderCommand::SetClearColor({0.1f,0.1f,0.1f,1.0f});
 		Dragon::RenderCommand::Clear();
 
-		m_Camera.SetPosition(m_CameraPosition);
-		m_Camera.SetRotation(m_CameraRotation);
+		Dragon::Renderer::BeginScene();
 
-		Dragon::Renderer::BeginScene(m_Camera);
-
-		m_Shader->Bind();
-		m_Shader->UploadUniformMat4("u_ViewPorjection", m_Camera.GetViewProjectionMatrix());
+		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+		auto textureShader = m_ShaderLibrary.Get("texture");
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->Bind();
+		m_Texture->Bind(0);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Transform", scale);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_View", camera.GetViewMatrix());
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Projection", camera.GetProjectionMatrix());
 		Dragon::Renderer::Submit(m_VertexArray);
 
 		Dragon::Renderer::EndScene();
+	}
+	virtual void OnImGuiRender() override
+	{
+
 	}
 
 
@@ -92,16 +77,14 @@ public:
 	}
 
 private:
-	std::shared_ptr<Dragon::Shader> m_Shader;
+	Dragon::ShaderLibrary m_ShaderLibrary;
 	std::shared_ptr<Dragon::VertexArray>m_VertexArray;
 
-	Dragon::OrthographicCamera m_Camera;
-	glm::vec3 m_CameraPosition;
+	std::shared_ptr<Dragon::Texture2D> m_Texture;
 
-	float m_CameraMoveSpeed = 5.0f;
+	Dragon::Camera camera;
 
-	float m_CameraRotation = 0.0f;
-	float m_CameraRotationSpeed = 180.0f;
+	
 };
 
 class Sandbox : public Dragon::Application
