@@ -5,54 +5,53 @@
 
 namespace Dragon
 {
-	enum CameraMovement
-	{
-		FORWARD,
-		BACKWARD,
-		LEFT,
-		RIGHT
-	};
-
-	// 摄像机默认参数
-	const float YAW = -90.0f;
-	const float PITCH = 0.0f;
-	const float SPEED = 2.5f;
-	const float SENSITIVITY = 0.1f;
-	const float ZOOM = 45.0f;
-
 	class Camera
 	{
 	public:
-		Camera(glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH);
-		Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch);
+		Camera(glm::vec3& position = glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f), float farPlane = 0.1f, float nearPlane = 100.0f);
+		Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float nearPlane, float farPlane);
 		~Camera() = default;
 
-		inline glm::mat4 GetViewMatrix() { return glm::lookAt(Position, Position + Front, Up); }
-		inline glm::mat4 GetProjectionMatrix() {return glm::perspective((float)glm::radians(Zoom), 1280.0f/720.0f, 0.1f, 100.0f);}
-		void ProcessKeyboard(CameraMovement direction, float deltaTime);
-		void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
-		void ProcessMouseScroll(float yoffset);
-		glm::vec3 GetPosition() { return Position; }
-		void SetPosition(glm::vec3 position) { Position = position; }
+		inline glm::mat4 GetViewMatrix() { return glm::lookAt(m_Position, m_Position + m_Front, m_Up); }
+		inline glm::mat4 GetProjectionMatrix() {return glm::perspective((float)glm::radians(m_Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);}
+		glm::vec3 GetPosition() { return m_Position; }
+		void SetPosition(glm::vec3 position) { m_Position = position; }
 
-	private:
-		void updateCameraVectors();
+		glm::vec3 GetFront() { return m_Front; }
+		void SetFront(glm::vec3 front) { m_Front = front; }
+
+		glm::vec3 GetUp() { return m_Up; }
+		void SetUp(glm::vec3 up) { m_Up = up; }
+
+		glm::vec3 GetRight() { return m_Right; }
+		void SetRight(glm::vec3 right) { m_Right = right; }
+
+		glm::vec3 GetWorldUp() { return m_WorldUp; }
+		void SetWorldUp(glm::vec3 worldUp) { m_WorldUp = worldUp; }
+
+		float GetZoom() { return m_Zoom; }
+		void SetZoom(float zoom) { m_Zoom = zoom; }
+
+		float GetAspectRatio() { return m_AspectRatio; }
+		void SetAspectRatio(float aspectRatio) { m_AspectRatio = aspectRatio; }
+
+		float GetNearPlane() { return m_NearPlane; }
+		void SetNearPlane(float nearPlane) { m_NearPlane = nearPlane; }
+
+		float GetFarPlane() { return m_FarPlane; }
+		void SetFarPlane(float farPlane) { m_FarPlane = farPlane; }
 	private:
 		//摄像机参数
-		glm::vec3 Position;
-		glm::vec3 Front;
-		glm::vec3 Up;
-		glm::vec3 Right;
-		glm::vec3 WorldUp;
+		glm::vec3 m_Position;
+		glm::vec3 m_Front;
+		glm::vec3 m_Up;
+		glm::vec3 m_Right;
+		glm::vec3 m_WorldUp;
+		float m_NearPlane;
+		float m_FarPlane;
+		float m_AspectRatio = 1280.0f/720.f;
 
-		//欧拉角
-		float Yaw;
-		float Pitch;
-
-		//摄像机选项
-		float MovementSpeed;
-		float MouseSensitivity;
-		float Zoom;
+		float m_Zoom = 45.0f;
 	};
 
 }

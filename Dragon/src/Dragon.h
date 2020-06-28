@@ -10,6 +10,7 @@
 #include "Dragon/Log.h"
 #include "Dragon/ImGui/ImGuiLayer.h"
 #include "Dragon/Core/Timestep.h"
+#include "Dragon/CameraController.h"
 
 // ---Renderer--------------------------
 #include "Dragon/Renderer/Renderer.h"
@@ -22,7 +23,6 @@
 #include "Dragon/Renderer/Texture.h"
 #include "Dragon/Renderer/VertexArray.h"
 
-//#include "Dragon/Renderer/OrthographicCamera.h"
 //---------------------------------------
 
 // ---Entry Point -----------------------

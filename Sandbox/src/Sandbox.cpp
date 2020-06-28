@@ -11,10 +11,9 @@ class ExampleLayer : public Dragon::Layer
 {
 public:
 	ExampleLayer()
-		: Layer("Example")
+		: Layer("Example"),m_CameraController(1280.0/720.f)
 	{
-		camera.SetPosition(glm::vec3(0, 0, 1.0));
-
+		
 		m_VertexArray.reset(Dragon::VertexArray::Create());
 		float vertices[3 * 6] = {
 			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
@@ -49,18 +48,20 @@ public:
 
 	void OnUpdate(Dragon::Timestep ts) override
 	{
+		m_CameraController.OnUpdate(ts);
+
 		Dragon::RenderCommand::SetClearColor({0.1f,0.1f,0.1f,1.0f});
 		Dragon::RenderCommand::Clear();
 
 		Dragon::Renderer::BeginScene();
 
-		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
+		//glm::mat4 transform = glm::mat4(1.0f);
 		auto textureShader = m_ShaderLibrary.Get("texture");
 		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->Bind();
 		m_Texture->Bind(0);
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Transform", scale);
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_View", camera.GetViewMatrix());
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Projection", camera.GetProjectionMatrix());
+		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Transform", transform);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_View", m_CameraController.GetCamera().GetViewMatrix());
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Projection", m_CameraController.GetCamera().GetProjectionMatrix());
 		Dragon::Renderer::Submit(m_VertexArray);
 
 		Dragon::Renderer::EndScene();
@@ -73,7 +74,7 @@ public:
 
 	void OnEvent(Dragon::Event& event) override
 	{
-		
+		m_CameraController.OnEvent(event);
 	}
 
 private:
@@ -82,7 +83,8 @@ private:
 
 	std::shared_ptr<Dragon::Texture2D> m_Texture;
 
-	Dragon::Camera camera;
+	Dragon::CameraController m_CameraController;
+	Dragon::Camera m_Camera;
 
 	
 };
