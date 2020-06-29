@@ -30,6 +30,7 @@ namespace Dragon
 
 		inline static Application& Get() { return *s_Instance; }
 		inline Window& GetWindow() { return *m_Window; }
+
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 	private:
@@ -37,7 +38,7 @@ namespace Dragon
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
-
+		Timestep timestep;
 		float m_LastFrameTime = 0.0f;
 
 	private:

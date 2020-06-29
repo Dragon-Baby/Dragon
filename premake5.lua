@@ -18,6 +18,7 @@ IncludeDir["GLAD"] = "Dragon/vendor/GLAD/include"
 IncludeDir["ImGui"] = "Dragon/vendor/ImGui"
 IncludeDir["glm"] = "Dragon/vendor/glm"
 IncludeDir["stb_image"] = "Dragon/vendor/stb_image"
+IncludeDir["Assimp"] = "Dragon/vendor/Assimp/include"
 
 include "Dragon/vendor/GLFW"
 include "Dragon/vendor/GLAD"
@@ -43,7 +44,10 @@ project "Dragon"
         "%{prj.name}/vendor/stb_image/**.h",
 		"%{prj.name}/vendor/stb_image/**.cpp",
         "%{prj.name}/vendor/glm/glm/**.hpp",
-        "%{prj.name}/vendor/glm/glm/**.inl"
+        "%{prj.name}/vendor/glm/glm/**.inl",
+        "%{prj.name}/vendor/Assimp/include/assimp/**.hpp",
+        "%{prj.name}/vendor/Assimp/include/assimp/**.h",
+        "%{prj.name}/vendor/Assimp/include/assimp/**.inl"
     }
 
     defines
@@ -59,7 +63,8 @@ project "Dragon"
         "%{IncludeDir.GLAD}",
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.stb_image}"
+        "%{IncludeDir.stb_image}",
+        "%{IncludeDir.Assimp}"
     }
 
     links

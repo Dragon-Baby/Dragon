@@ -12,7 +12,10 @@ namespace Dragon
 
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
-
+		virtual std::string GetType() const = 0;
+		virtual void SetType(std::string type)  = 0;
+		virtual std::string GetPath() const = 0;
+		virtual void SetPath(std::string path)  = 0;
 		virtual void Bind(uint32_t slot = 0) const = 0;
 	};
 
@@ -20,5 +23,6 @@ namespace Dragon
 	{
 	public:
 		static std::shared_ptr<Texture2D> Create(const std::string& path);
+		static std::shared_ptr<Texture2D> Create(const std::string& path, const std::string& directory);
 	};
 }

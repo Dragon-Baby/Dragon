@@ -4,6 +4,8 @@
 #include "Dragon/Input.h"
 #include "Dragon/KeyCodes.h"
 
+#include "Dragon/Application.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Dragon
@@ -15,17 +17,8 @@ namespace Dragon
 	}
 	void CameraController::OnUpdate(Timestep ts)
 	{
-		if (Input::IsKeyPressed(DG_KEY_LEFT))
-			m_CameraPosition.x -= m_CameraTranslationSpeed * ts;
-		if (Input::IsKeyPressed(DG_KEY_RIGHT))
-			m_CameraPosition.x += m_CameraTranslationSpeed * ts;
-		if (Input::IsKeyPressed(DG_KEY_UP))
-			m_CameraPosition.z -= m_CameraTranslationSpeed * ts;
-		if (Input::IsKeyPressed(DG_KEY_DOWN))
-			m_CameraPosition.z += m_CameraTranslationSpeed * ts;
-
-		m_Camera.SetPosition(m_CameraPosition);
-
+		DG_CORE_TRACE("{0}",ts);
+		m_Timestep = ts;
 		//m_CameraTranslationSpeed = m_ZoomLevel;
 	}
 	void CameraController::OnEvent(Event& e)
@@ -34,6 +27,7 @@ namespace Dragon
 		dispatcher.Dispatch<MouseScrolledEvent>(DG_BIND_EVENT_FN(CameraController::OnMouseScrolled));
 		dispatcher.Dispatch<WindowResizeEvent>(DG_BIND_EVENT_FN(CameraController::OnWindowResized));
 		dispatcher.Dispatch<MouseMovedEvent>(DG_BIND_EVENT_FN(CameraController::OnMouseMoved));
+		dispatcher.Dispatch<KeyPressedEvent>(DG_BIND_EVENT_FN(CameraController::OnKeyBoard));
 	}
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
@@ -67,8 +61,8 @@ namespace Dragon
 		yOffset = (lastY - yPos) * m_MouseSensitivity;
 		lastX = xPos;
 		lastY = yPos;
-		m_Yaw += xOffset;
-		m_Pitch += yOffset;
+		m_Yaw -= xOffset;
+		m_Pitch -= yOffset;
 		if (m_Pitch > 89.0f)
 			m_Pitch = 89.0f;
 		if (m_Pitch < -89.0f)
@@ -77,6 +71,23 @@ namespace Dragon
 		UpdateCameraVectors();
 		return false;
 	}
+
+	bool CameraController::OnKeyBoard(KeyPressedEvent& e)
+	{
+		if (e.GetKeyCode()== DG_KEY_A)
+			m_CameraPosition.x += m_CameraTranslationSpeed * m_Timestep;
+		if (e.GetKeyCode() == DG_KEY_D)
+			m_CameraPosition.x -= m_CameraTranslationSpeed * m_Timestep;
+		if (e.GetKeyCode() == DG_KEY_W)
+			m_CameraPosition.z -= m_CameraTranslationSpeed * m_Timestep;
+		if (e.GetKeyCode() == DG_KEY_S)
+			m_CameraPosition.z += m_CameraTranslationSpeed * m_Timestep;
+
+		m_Camera.SetPosition(m_CameraPosition);
+		return false;
+	}
+
+
 	void CameraController::UpdateCameraVectors()
 	{
 		glm::vec3 front;
