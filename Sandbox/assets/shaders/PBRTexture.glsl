@@ -23,7 +23,6 @@ void main()
 
 #type fragment
 #version 330 core
-
 #define lightNum 4
 layout(location = 0)out vec4 FragColor;
 
@@ -32,10 +31,11 @@ in vec3 v_WorldPos;
 in vec3 v_Normal;
 
 // material
-uniform vec3 u_Albedo;
-uniform float u_Metallic;
-uniform float u_Roughness;
-uniform float u_AO;
+uniform sampler2D u_AlbedoMap;
+uniform sampler2D u_NormalMap;
+uniform sampler2D u_MetallicMap;
+uniform sampler2D u_RoughnessMap;
+uniform sampler2D u_AOMap;
 
 // lights
 uniform vec3 u_LightPositions[lightNum];
@@ -45,10 +45,26 @@ uniform vec3 u_CameraPos;
 
 const float PI = 3.14159265359;
 
-
-float DistributionGGX(vec3 N, vec3 H, float u_Roughness)
+vec3 getNormalFromMap()
 {
-	float a = u_Roughness*u_Roughness;
+	vec3 tangentNormal = texture(u_NormalMap, v_TexCoords).xyz *2.0 -1.0;
+
+	vec3 Q1 = dFdx(v_WorldPos);
+	vec3 Q2 = dFdy(v_WorldPos);
+	vec2 st1 = dFdx(v_TexCoords);
+	vec2 st2 = dFdy(v_TexCoords);
+
+	vec3 N = normalize(v_Normal);
+	vec3 T = normalize(Q1*st2.t - Q2*st2.t);
+	vec3 B = -normalize(cross(N,T));
+	mat3 TBN = mat3(T,B,N);
+
+	return normalize(TBN * tangentNormal);
+}
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+	float a = roughness*roughness;
 	float a2 = a*a;
 	float NdotH = max(dot(N, H), 0.0);
 	float NdotH2 = NdotH * NdotH;
@@ -60,9 +76,9 @@ float DistributionGGX(vec3 N, vec3 H, float u_Roughness)
 	return nom / denom;
 }
 
-float GeometrySchlickGGX(float NdotV, float u_Roughness)
+float GeometrySchlickGGX(float NdotV, float roughness)
 {
-	float r = u_Roughness + 1.0;
+	float r = roughness + 1.0;
 	float k = (r*r)/8.0;
 
 	float nom = NdotV;
@@ -71,12 +87,12 @@ float GeometrySchlickGGX(float NdotV, float u_Roughness)
 	return nom / denom;
 }
 
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float u_Roughness)
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 {
 	float NdotV = max(dot(N,V), 0.0);
 	float NdotL = max(dot(N,L), 0.0);
-	float ggx2 = GeometrySchlickGGX(NdotV, u_Roughness);
-	float ggx1 = GeometrySchlickGGX(NdotL, u_Roughness);
+	float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+	float ggx1 = GeometrySchlickGGX(NdotL, roughness);
 
 	return ggx1 * ggx2;
 }
@@ -88,12 +104,17 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 
 void main()
 {
-	vec3 N = normalize(v_Normal);
+	vec3 albedo = pow(texture(u_AlbedoMap, v_TexCoords).rgb, vec3(2.2));
+	float metallic = texture(u_MetallicMap, v_TexCoords).r;
+	float roughness = texture(u_RoughnessMap, v_TexCoords).r;
+	float ao = texture(u_AOMap, v_TexCoords).r;
+
+	vec3 N = getNormalFromMap();
 	vec3 V = normalize(u_CameraPos - v_WorldPos);
 
 	//金属流程
 	vec3 F0 = vec3(0.04);
-	F0 = mix(F0, u_Albedo, u_Metallic);
+	F0 = mix(F0, albedo, metallic);
 
 	//反射方程
 	vec3 Lo = vec3(0.0);
@@ -107,8 +128,8 @@ void main()
 		vec3 radiance = u_LightColors[i] * attenuation;
 
 		//BRDF
-		float NDF = DistributionGGX(N, H, u_Roughness);
-		float G = GeometrySmith(N, V, L, u_Roughness);
+		float NDF = DistributionGGX(N, H, roughness);
+		float G = GeometrySmith(N, V, L, roughness);
 		vec3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
 		vec3 nominator = NDF * G * F;
@@ -122,11 +143,11 @@ void main()
 
 		float NdotL = max(dot(N, L), 0.0);
 
-		Lo += (kD * u_Albedo / PI + specular) ** radiance * NdotL;
+		Lo += (kD * albedo / PI + specular) ** radiance * NdotL;
 	}
 
 	// 环境光
-	vec3 ambient = vec3(0.03) * u_Albedo * u_AO;
+	vec3 ambient = vec3(0.03) * albedo * ao;
 	vec3 color = ambient + Lo;
 
 	// HDR色调映射

@@ -25,7 +25,7 @@ public:
 		vertexBuffer.reset(Dragon::VertexBuffer::Create(vertices, sizeof(vertices)));
 		Dragon::BufferLayout layout = {
 			{Dragon::ShaderDataType::Float3, "a_Position"},
-			{Dragon::ShaderDataType::Float2, "a_TexCoord"}
+			{Dragon::ShaderDataType::Float2, "a_TexCoords"}
 		};
 
 		vertexBuffer->SetLayout(layout);
@@ -38,12 +38,12 @@ public:
 
 		m_VertexArray->SetIndexBuffer(indexBuffer);
 
-		auto textureShader = m_ShaderLibrary.Load("assets/shaders/texture.glsl");
+		//auto textureShader = m_ShaderLibrary.Load("assets/shaders/texture.glsl");
 
 		m_Texture = Dragon::Texture2D::Create("assets/textures/wall.jpg");
 
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->Bind();
+		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Dragon::Timestep ts) override
@@ -56,19 +56,24 @@ public:
 		Dragon::Renderer::BeginScene();
 
 		//glm::mat4 transform = glm::mat4(1.0f);
-		auto textureShader = m_ShaderLibrary.Get("texture");
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->Bind();
-		m_Texture->Bind(0);
+		//auto textureShader = m_ShaderLibrary.Get("texture");
+		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->Bind();
+		//m_Texture->Bind(0);
 		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Transform", transform);
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_View", m_CameraController.GetCamera().GetViewMatrix());
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Projection", m_CameraController.GetCamera().GetProjectionMatrix());
+		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_View", m_CameraController.GetCamera().GetViewMatrix());
+		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(textureShader)->UploadUniformMat4("u_Projection", m_CameraController.GetCamera().GetProjectionMatrix());
 		Dragon::Renderer::Submit(m_VertexArray);
 
 		Dragon::Renderer::EndScene();
 	}
 	virtual void OnImGuiRender() override
 	{
-
+		ImGui::Begin("window");
+		ImGui::ColorPicker3("Color", m_Color);
+		ImGui::SliderFloat("Metallic", &m_Metallic, 0.0f, 1.0f);
+		ImGui::SliderFloat("Roughness", &m_Roughness, 0.0f, 1.0f);
+		ImGui::SliderFloat("AO", &m_AO, 0.0f, 1.0f);
+		ImGui::End();
 	}
 
 
@@ -86,7 +91,11 @@ private:
 	Dragon::CameraController m_CameraController;
 	Dragon::Camera m_Camera;
 
-	
+	bool m_Check = false;
+	float m_Metallic = 0.0f;
+	float m_Roughness = 0.0f;
+	float m_AO = 0.0f;
+	float m_Color[3] = {0.0f, 0.0f, 0.0f};
 };
 
 class Sandbox : public Dragon::Application
