@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Dragon/Core.h"
+#include "Dragon/Core/Core.h"
 #include "dgpch.h"
 
 namespace Dragon

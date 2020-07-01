@@ -2,15 +2,15 @@
 
 // use by Dragon applications
 
-#include "Dragon/Application.h"
-#include "Dragon/Input.h"
-#include "Dragon/KeyCodes.h"
-#include "Dragon/MouseButtonCodes.h"
-#include "Dragon/Layer.h"
-#include "Dragon/Log.h"
+#include "Dragon/Core/Application.h"
+#include "Dragon/Core/Input.h"
+#include "Dragon/Core/KeyCodes.h"
+#include "Dragon/Core/MouseButtonCodes.h"
+#include "Dragon/Core/Layer.h"
+#include "Dragon/Core/Log.h"
 #include "Dragon/ImGui/ImGuiLayer.h"
 #include "Dragon/Core/Timestep.h"
-#include "Dragon/CameraController.h"
+#include "Dragon/Core/CameraController.h"
 
 // ---Renderer--------------------------
 #include "Dragon/Renderer/Renderer.h"
@@ -26,6 +26,6 @@
 //---------------------------------------
 
 // ---Entry Point -----------------------
-# include "Dragon/EntryPoint.h"
+# include "Dragon/Core/EntryPoint.h"
 // ---------------------------------------
 

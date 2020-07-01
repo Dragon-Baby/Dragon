@@ -121,12 +121,16 @@ project "Sandbox"
         "Dragon/vendor/spdlog/include",
         "Dragon/src",
         "Dragon/vendor",
-        "%{IncludeDir.glm}"
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.GLAD}",
     }
 
     links
     {
-        "Dragon"
+        "Dragon",
+        "GLAD",
+        "opengl32.lib"
+
     }
 
     filter "system:windows"

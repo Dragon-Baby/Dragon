@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Dragon/Window.h"
+#include "Dragon/Core/Window.h"
 
 #include <GLFW/glfw3.h>
 

@@ -11,7 +11,8 @@ namespace Dragon
 	public:
 		static void Init();
 
-		static void BeginScene();
+		static void BeginScene(bool DepthTest = false,bool StencilTest = false, bool Blend = false);
+		
 		static void EndScene();
 
 		static void Submit(const std::shared_ptr<VertexArray>& vertexArray);

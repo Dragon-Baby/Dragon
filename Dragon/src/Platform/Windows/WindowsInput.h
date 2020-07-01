@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Dragon/Input.h"
+#include "Dragon/Core/Input.h"
 
 namespace Dragon
 {

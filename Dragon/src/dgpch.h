@@ -13,7 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Dragon/Log.h"
+#include "Dragon/Core/Log.h"
 
 #ifdef DG_PLATFORM_WINDOWS
 	#include <Windows.h>
