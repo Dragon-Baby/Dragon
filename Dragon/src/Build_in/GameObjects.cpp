@@ -14,10 +14,15 @@ namespace Dragon
 	//-----------------------------------------------------------------------
 	//球体-------------------------------------------------------------------
 	//-----------------------------------------------------------------------
-	Sphere::Sphere(const float radius, const glm::vec3& position)
+	Sphere::Sphere(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
 	{
-		m_Radius = radius;
 		m_Pos = position;
+		m_Scale = scale;
+		m_Rotation = rotation;
+
+		m_LastPos = m_Pos;
+		m_LastScale = m_Scale;
+		m_LastRotation = m_Rotation;
 	}
 
 	void Sphere::Init()
@@ -102,8 +107,34 @@ namespace Dragon
 
 	void Sphere::Render()
 	{
-		glDepthMask(GL_FALSE);
-		Renderer::Submit(m_VertexArray);
+		m_VertexArray->Bind();
+		glDrawElements(GL_TRIANGLE_STRIP, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		m_VertexArray->Unbind();
+	}
+
+	glm::mat4 Sphere::GetModel()
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+		if (m_LastScale.x == 0)
+			model = glm::scale(model, glm::vec3(m_Scale.x, 0, 0));
+		else
+			model = glm::scale(model, glm::vec3(m_Scale.x/m_LastScale.x, 0, 0));
+		if (m_LastScale.y == 0)
+			model = glm::scale(model, glm::vec3(0, m_Scale.y, 0));
+		else
+			model = glm::scale(model, glm::vec3(0, m_Scale.y/m_LastScale.y, 0));
+		if (m_LastScale.z == 0)
+			model = glm::scale(model, glm::vec3(0, 0, m_Scale.z));
+		else
+			model = glm::scale(model, glm::vec3(0, 0, m_Scale.z/m_LastScale.z));
+
+		model = glm::rotate(model, glm::radians(m_Rotation.z - m_LastRotation.z), glm::vec3(0, 0, 1));
+		model = glm::rotate(model, glm::radians(m_Rotation.x - m_LastRotation.x), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(m_Rotation.y - m_LastRotation.y), glm::vec3(0, 1, 0));
+		
+		model = glm::translate(model, glm::vec3(m_Pos.x - m_LastPos.x, m_Pos.y - m_LastPos.y, m_Pos.z - m_LastPos.z));
+
+		return model;
 	}
 
 	//------------------------------------------------------------------------
@@ -111,31 +142,49 @@ namespace Dragon
 	//-----------------------------------------------------------------------
 	void SkyBox::Init()
 	{
-		float vertices[3 * 8] = {
-			1.0f, 1.0f, -1.0f,	//0
-			1.0f, 1.0f, 1.0f,	//1
-			1.0f, -1.0f, 1.0f,	//2
-			-1.0f, -1.0f, -1.0f,	//3
+		float vertices[] = {
+			// positions          
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
 
-			-1.0f, 1.0f, -1.0f,		//4
-			-1.0f, 1.0f, 1.0f,	//5
-			-1.0f, -1.0f, 1.0f,	//6
-			1.0f, -1.0f, -1.0f	//7
-		};
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
 
-		unsigned int indices[3 * 12] = {
-			0,1,2,
-			0,2,3,	//右
-			4,7,5,
-			5,7,6,	//左
-			0,4,5,
-			0,5,7,	//上
-			2,6,7,
-			2,7,3,	//下
-			1,5,6,
-			1,6,2,	//前
-			4,0,3,
-			4,3,7	//后
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
 		};
 
 		m_VertexArray.reset(VertexArray::Create());
@@ -149,19 +198,15 @@ namespace Dragon
 		vertexBuffer->SetLayout(layout);
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 
-		indexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)));
-		m_VertexArray->SetIndexBuffer(indexBuffer);
-
 		m_CubeMap = LoadCubeMap(m_Faces);
 	}
 
 	void SkyBox::Render()
 	{
-		glDepthMask(GL_FALSE);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, m_CubeMap);
-		Renderer::Submit(m_VertexArray);
-		glDepthMask(GL_TRUE);
+		m_VertexArray->Bind();
+		glBindTextureUnit(GL_TEXTURE_CUBE_MAP, m_CubeMap);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		m_VertexArray->Unbind();
 	}
 
 	unsigned int SkyBox::LoadCubeMap(std::vector<std::string> faces)
@@ -192,5 +237,111 @@ namespace Dragon
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 		return textureID;
+	}
+
+	//------------------------------------------------------------------------
+	//立方体
+	//-----------------------------------------------------------------------
+	Cube::Cube(glm::vec3 position, glm::vec3 rotation, glm::vec3 scale)
+	{
+		m_Position = position;
+		m_Rotation = rotation;
+		m_Scale = scale;
+
+		m_LastPosition = m_Position;
+		m_LastScale = m_Scale;
+		m_LastRotation = m_Rotation;
+	}
+
+	void Cube::Init()
+	{
+		float vertices[] = {
+			// positions		  //texcoords	//normals  
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,	0.0f,  0.0f, -1.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,	0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,	0.0f,  0.0f, -1.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,	0.0f,  0.0f, -1.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,	0.0f,  0.0f, -1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,	0.0f,  0.0f, -1.0f,
+
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,	0.0f,  0.0f, 1.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,	0.0f,  0.0f, 1.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,	0.0f,  0.0f, 1.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,	0.0f,  0.0f, 1.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,	0.0f,  0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,	0.0f,  0.0f, 1.0f,
+
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,	-1.0f,  0.0f,  0.0f,
+			-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,	-1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,	-1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,	-1.0f,  0.0f,  0.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,	-1.0f,  0.0f,  0.0f,
+			-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,	-1.0f,  0.0f,  0.0f,
+				
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,	1.0f,  0.0f,  0.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,	1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,	1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,	1.0f,  0.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,	1.0f,  0.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,	1.0f,  0.0f,  0.0f,
+
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,	0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,	0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,	0.0f, -1.0f,  0.0f,
+			 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,	0.0f, -1.0f,  0.0f,
+			-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,	0.0f, -1.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,	0.0f, -1.0f,  0.0f,
+
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,	0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,	0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,	0.0f,  1.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,	0.0f,  1.0f,  0.0f,
+			-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,	0.0f,  1.0f,  0.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,	0.0f,  1.0f,  0.0f
+		};
+
+		m_VertexArray.reset(VertexArray::Create());
+		std::shared_ptr<VertexBuffer> vertexBuffer;
+		BufferLayout layout = {
+			{ShaderDataType::Float3, "a_Position"},
+			{ShaderDataType::Float2, "a_TexCoords"},
+			{ShaderDataType::Float3, "a_Normal"}
+		};
+
+		vertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
+		vertexBuffer->SetLayout(layout);
+		m_VertexArray->AddVertexBuffer(vertexBuffer);
+
+	}
+
+	void Cube::Render()
+	{
+		m_VertexArray->Bind();
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+	glm::mat4& Cube::GetModel()
+	{
+		
+		if (m_LastScale.x == 0)
+			m_Model = glm::scale(m_Model, glm::vec3(m_Scale.x, 1.0, 1.0));
+		else
+			m_Model = glm::scale(m_Model, glm::vec3(m_Scale.x / m_LastScale.x, 1.0, 1.0));
+		if (m_LastScale.y == 0)
+			m_Model  = glm::scale(m_Model, glm::vec3(1.0, m_Scale.y, 1.0));
+		else
+			m_Model = glm::scale(m_Model, glm::vec3(1.0, m_Scale.y / m_LastScale.y, 1.0));
+		if (m_LastScale.z == 0)
+			m_Model = glm::scale(m_Model, glm::vec3(1.0, 1.0, m_Scale.z));
+		else
+			m_Model = glm::scale(m_Model, glm::vec3(1.0, 1.0, m_Scale.z / m_LastScale.z));
+
+		m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.z - m_LastRotation.z), glm::vec3(0, 0, 1));
+		m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.x - m_LastRotation.x), glm::vec3(1, 0, 0));
+		m_Model = glm::rotate(m_Model, glm::radians(m_Rotation.y - m_LastRotation.y), glm::vec3(0, 1, 0));
+
+		m_Model = glm::translate(m_Model, glm::vec3(m_Position.x - m_LastPosition.x, m_Position.y - m_LastPosition.y, m_Position.z - m_LastPosition.z));
+
+
+		return m_Model;
 	}
 }

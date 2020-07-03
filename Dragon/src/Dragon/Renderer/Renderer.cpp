@@ -31,5 +31,6 @@ namespace Dragon
 	{
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
+		vertexArray->Unbind();
 	}
 }

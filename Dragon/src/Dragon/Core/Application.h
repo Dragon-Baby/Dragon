@@ -6,6 +6,7 @@
 #include "Dragon/Core/LayerStack.h"
 #include "Dragon/Events/Event.h"
 #include "Dragon/Events/ApplicationEvent.h"
+#include "Dragon/Events/KeyEvents.h"
 
 #include "Dragon/ImGui/ImGuiLayer.h"
 
@@ -33,10 +34,12 @@ namespace Dragon
 
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnKeyBoard(KeyPressedEvent& e);
 	private:
 		std::unique_ptr<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
+		bool m_Cursor = true;
 		LayerStack m_LayerStack;
 		Timestep timestep;
 		float m_LastFrameTime = 0.0f;

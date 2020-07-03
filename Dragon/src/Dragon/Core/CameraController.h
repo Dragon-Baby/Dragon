@@ -30,15 +30,18 @@ namespace Dragon
 		void UpdateCameraVectors();
 	private:
 		Camera m_Camera;
+		Camera m_LastCamera;
 		glm::vec3 m_CameraPosition = glm::vec3(0.0f,0.0f,5.0f);
 		float m_AspectRatio;
-		float m_CameraTranslationSpeed = 10.0f;
+		float m_CameraTranslationSpeed = 5.0f;
 		float m_ZoomLevel = 45.0f;
-		float m_MouseSensitivity = 0.001f;
+		float m_MouseSensitivity = 0.01f;
 		float m_Yaw = -90.0f;
 		float m_Pitch = 0.0f;
 		bool firstMouse = true;
-		float lastX, lastY;
+		float lastX , lastY ;
 		Timestep m_Timestep;
+
+		bool m_Quit = true;
 	};
 }

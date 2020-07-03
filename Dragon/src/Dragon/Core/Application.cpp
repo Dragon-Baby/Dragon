@@ -5,6 +5,7 @@
 
 #include "Dragon/Renderer/Renderer.h"
 #include "Input.h"
+#include "KeyCodes.h"
 
 #include <GLFW/glfw3.h>
 
@@ -44,6 +45,7 @@ namespace Dragon
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
+		dispatcher.Dispatch<KeyPressedEvent>(BIND_EVENT_FN(OnKeyBoard));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
@@ -57,6 +59,11 @@ namespace Dragon
 	{
 		while (m_Running)
 		{
+			if(!m_Cursor)
+				glfwSetInputMode((GLFWwindow*)m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+			else
+				glfwSetInputMode((GLFWwindow*)m_Window->GetNativeWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
 			float time = (float)glfwGetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
@@ -77,5 +84,16 @@ namespace Dragon
 	{
 		m_Running = false;
 		return true;
+	}
+	bool Application::OnKeyBoard(KeyPressedEvent& e)
+	{
+		if (e.GetKeyCode() == DG_KEY_Q)
+		{
+			if (!m_Cursor)
+				m_Cursor = true;
+			else
+				m_Cursor = false;
+		}
+		return false;
 	}
 }

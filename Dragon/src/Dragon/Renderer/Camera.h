@@ -8,9 +8,23 @@ namespace Dragon
 	class Camera
 	{
 	public:
-		Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float farPlane = 0.1f, float nearPlane = 100.0f);
+		Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 5.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float farPlane = 0.1f, float nearPlane = 100.0f);
 		Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float nearPlane, float farPlane);
 		~Camera() = default;
+
+		Camera(Camera& camera) 
+		{
+			m_Position = camera.m_Position;
+			m_Front = camera.m_Front;
+			m_Up = camera.m_Up;
+			m_Right = camera.m_Right;
+			m_WorldUp = camera.m_WorldUp;
+			m_Zoom = camera.m_Zoom;
+			m_NearPlane = camera.m_NearPlane;
+			m_FarPlane = camera.m_FarPlane;
+			m_AspectRatio = camera.m_AspectRatio;
+
+		}
 
 		inline glm::mat4 GetViewMatrix() { return glm::lookAt(m_Position, m_Position + m_Front, m_Up); }
 		inline glm::mat4 GetProjectionMatrix() {return glm::perspective((float)glm::radians(m_Zoom), m_AspectRatio, m_NearPlane, m_FarPlane);}

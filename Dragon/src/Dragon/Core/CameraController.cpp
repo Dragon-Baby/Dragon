@@ -8,6 +8,7 @@
 
 #include <GLFW/glfw3.h>
 
+
 namespace Dragon
 {
 	CameraController::CameraController(float aspectRatio)
@@ -18,6 +19,7 @@ namespace Dragon
 	void CameraController::OnUpdate(Timestep ts)
 	{
 		m_Timestep = ts;
+		UpdateCameraVectors();
 		//m_CameraTranslationSpeed = m_ZoomLevel;
 	}
 	void CameraController::OnEvent(Event& e)
@@ -30,11 +32,13 @@ namespace Dragon
 	}
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
-		m_ZoomLevel -= (e.GetYOffset() * 0.25f);
-		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-		//m_Camera.SetAspectRatio(m_Camera.GetAspectRatio() * m_ZoomLevel);
+		if (m_ZoomLevel >= 1.0f && m_ZoomLevel <= 45.0f)
+			m_ZoomLevel -= e.GetYOffset();
+		if (m_ZoomLevel <= 1.0f)
+			m_ZoomLevel = 1.0f;
+		if (m_ZoomLevel >= 45.0f)
+			m_ZoomLevel = 45.0f;
 		m_Camera.SetZoom(m_ZoomLevel);
-
 		return false;
 	}
 	bool CameraController::OnWindowResized(WindowResizeEvent& e)
@@ -44,45 +48,59 @@ namespace Dragon
 	}
 	bool CameraController::OnMouseMoved(MouseMovedEvent& e)
 	{
-		float xPos, yPos;
-		xPos = e.GetX();
-		yPos = e.GetY();
-		if (firstMouse)
+		if (m_Quit)
 		{
+			float xPos, yPos;
+			xPos = e.GetX();
+			yPos = e.GetY();
+			if (firstMouse)
+			{
+				lastX = xPos;
+				lastY = yPos;
+				firstMouse = false;
+			}
+
+			float xOffset = 0.0f;
+			float yOffset = 0.0f;
+			xOffset = (xPos - lastX) * m_MouseSensitivity;
+			yOffset = (lastY - yPos) * m_MouseSensitivity;
 			lastX = xPos;
 			lastY = yPos;
-			firstMouse = false;
+			m_Yaw += xOffset;
+			m_Pitch += yOffset;
+			if (m_Pitch > 89.0f)
+				m_Pitch = 89.0f;
+			if (m_Pitch < -89.0f)
+				m_Pitch = -89.0f;
 		}
 
-		float xOffset = 0.0f;
-		float yOffset = 0.0f;
-		xOffset = (xPos - lastX) * m_MouseSensitivity;
-		yOffset = (lastY - yPos) * m_MouseSensitivity;
-		lastX = xPos;
-		lastY = yPos;
-		m_Yaw -= xOffset;
-		m_Pitch -= yOffset;
-		if (m_Pitch > 89.0f)
-			m_Pitch = 89.0f;
-		if (m_Pitch < -89.0f)
-			m_Pitch = -89.0f;
-
-		UpdateCameraVectors();
 		return false;
 	}
 
 	bool CameraController::OnKeyBoard(KeyPressedEvent& e)
 	{
-		if (e.GetKeyCode()== DG_KEY_A)
-			m_CameraPosition.x += m_CameraTranslationSpeed * m_Timestep;
+		if (e.GetKeyCode() == DG_KEY_A)
+			m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetRight() * (m_CameraTranslationSpeed * m_Timestep));
 		if (e.GetKeyCode() == DG_KEY_D)
-			m_CameraPosition.x -= m_CameraTranslationSpeed * m_Timestep;
+			m_Camera.SetPosition(m_Camera.GetPosition() + m_Camera.GetRight() * (m_CameraTranslationSpeed * m_Timestep));
 		if (e.GetKeyCode() == DG_KEY_W)
-			m_CameraPosition.z -= m_CameraTranslationSpeed * m_Timestep;
+			m_Camera.SetPosition(m_Camera.GetPosition() + m_Camera.GetFront() * (m_CameraTranslationSpeed * m_Timestep));
 		if (e.GetKeyCode() == DG_KEY_S)
-			m_CameraPosition.z += m_CameraTranslationSpeed * m_Timestep;
-
-		m_Camera.SetPosition(m_CameraPosition);
+			m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetFront() * (m_CameraTranslationSpeed * m_Timestep));
+		if (e.GetKeyCode() == DG_KEY_Q)
+		{
+			if (m_Quit)
+			{
+				m_LastCamera = m_Camera;
+				firstMouse = true;
+				m_Quit = !m_Quit;
+			}
+			else
+			{
+				m_Camera = m_LastCamera;
+				m_Quit = !m_Quit;
+			}
+		}
 		return false;
 	}
 
@@ -95,6 +113,7 @@ namespace Dragon
 		front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
 
 		m_Camera.SetFront(glm::normalize(front));
+		m_Camera.SetWorldUp(glm::vec3(0.0f, 1.0f, 0.0f));
 		m_Camera.SetRight(glm::normalize(glm::cross(m_Camera.GetFront(), m_Camera.GetWorldUp())));
 		m_Camera.SetUp(glm::cross(m_Camera.GetRight(), m_Camera.GetFront()));
 	}
