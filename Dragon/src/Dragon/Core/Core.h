@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #ifdef DG_PLATFORM_WINDOWS
 #if DG_DYNAMIC_LINK
 	#ifdef  DG_BUILD_DLL
@@ -26,6 +28,8 @@
 	#define DG_CORE_ASSERT(x, ...)
 #endif
 
+
 #define BIT(x) (1 << x)
 
 #define DG_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
+

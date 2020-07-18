@@ -32,12 +32,12 @@ namespace Dragon
 	}
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
-		if (m_ZoomLevel >= 1.0f && m_ZoomLevel <= 45.0f)
+		if (m_ZoomLevel >= 1.0f && m_ZoomLevel <= 90.0f)
 			m_ZoomLevel -= e.GetYOffset();
 		if (m_ZoomLevel <= 1.0f)
 			m_ZoomLevel = 1.0f;
-		if (m_ZoomLevel >= 45.0f)
-			m_ZoomLevel = 45.0f;
+		if (m_ZoomLevel >= 90.0f)
+			m_ZoomLevel = 90.0f;
 		m_Camera.SetZoom(m_ZoomLevel);
 		return false;
 	}

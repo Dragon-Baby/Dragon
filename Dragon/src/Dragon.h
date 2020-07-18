@@ -1,7 +1,6 @@
 #pragma once
 
 // use by Dragon applications
-
 #include "Dragon/Core/Application.h"
 #include "Dragon/Core/Input.h"
 #include "Dragon/Core/KeyCodes.h"
@@ -17,6 +16,8 @@
 #include "Dragon/Renderer/RenderCommand.h"
 
 #include "Dragon/Renderer/Camera.h"
+
+#include "Dragon/Renderer/Framebuffer.h"
 
 #include "Dragon/Renderer/Buffer.h"
 #include "Dragon/Renderer/Shader.h"

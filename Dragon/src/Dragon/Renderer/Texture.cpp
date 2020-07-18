@@ -35,4 +35,34 @@ namespace Dragon
 		DG_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
+
+	std::shared_ptr<TextureCube> TextureCube::Create(const std::vector<std::string>& faces)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			DG_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return std::make_shared<OpenGLTextureCube>(faces);
+		}
+
+		DG_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	std::shared_ptr<TextureCube> TextureCube::Create(const std::vector<std::string>& faces, const std::string& directory)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			DG_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return std::make_shared<OpenGLTextureCube>(faces);
+		}
+
+		DG_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
 }
