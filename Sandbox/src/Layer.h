@@ -49,16 +49,9 @@ public:
 		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformInt("u_ScreenTexture", 0);
 
 		//cube init
-		m_ShaderLibrary.Load("cubeShader", "assets/shaders/Blinn_PhongTexture.glsl");
-		auto cubeShader = m_ShaderLibrary.Get("cubeShader");
 		m_Albedo = Dragon::Texture2D::Create("assets/textures/wall.jpg");
 		m_Albedo->Bind();
-		skybox.GetCubeMap()->Bind();
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->Bind();
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformInt("u_Albedo", 0);
-		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformInt("u_SkyBox", 0);
-		std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformInt("u_ShadowMap", 1);
-
+		//skybox.GetCubeMap()->Bind();
 		glEnable(GL_MULTISAMPLE);
 	}
 
@@ -66,9 +59,17 @@ public:
 	{
 		m_CameraController.OnUpdate(ts);
 		ButtonClicked();
-		auto cubeShader = m_ShaderLibrary.Get("cubeShader");
+		//auto cubeShader = m_ShaderLibrary.Get("cubeShader");
 		auto skyBoxShader = m_ShaderLibrary.Get("skybox");
 		auto screenQuadShader = m_ShaderLibrary.Get("screenQuadShader");
+		for (auto gameObjectName : m_GameObjectsName)
+		{
+			auto gameObject = m_GameObjectLibrary.Get(gameObjectName);
+			if (!m_ShaderLibrary.Exists(gameObjectName))
+				m_ShaderLibrary.Load(gameObjectName, "assets/shaders/Blinn_PhongTexture.glsl");
+			auto Shader = m_ShaderLibrary.Get(gameObjectName);
+			std::dynamic_pointer_cast<Dragon::Cube>(gameObject)->SetShader(Shader);
+		}
 
 		glEnable(GL_DEPTH_TEST);
 		//MVP
@@ -85,33 +86,29 @@ public:
 			auto gameObject = m_GameObjectLibrary.Get(gameObjectName);
 			if (gameObject->GetType() == "Cube")
 				std::dynamic_pointer_cast<Dragon::Cube>(gameObject)->Init();
-			//cube
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->Bind();
+			
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->Bind();
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformInt("u_Albedo", 0);
+			//std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformInt("u_SkyBox", 0);
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformInt("u_ShadowMap", 1);
 			//CameraPos
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat3("u_CameraPos", m_CameraController.GetCamera().GetPosition());
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_CameraPos", m_CameraController.GetCamera().GetPosition());
 			//Material
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat("u_Shininess", 32.0f);
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat("u_Shininess", 32.0f);
 			//std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat3("u_Albedo", glm::vec3(0.5f, 0.3f, 0.2f));
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat("u_Specular", 0.5f);
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat("u_Specular", 0.5f);
 			//MVP
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformMat4("u_Model", gameObject->GetModel());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformMat4("u_Projection", m_CameraController.GetCamera().GetProjectionMatrix());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformMat4("u_View", m_CameraController.GetCamera().GetViewMatrix());
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_Model", gameObject->GetModel());
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_Projection", m_CameraController.GetCamera().GetProjectionMatrix());
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_View", m_CameraController.GetCamera().GetViewMatrix());
 			//dir light
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformMat4("u_LightSpaceMatrix", m_DirLight.GetLightSpaceMatrix());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat3("u_DirLight.direction", glm::vec3(-1.0f, -1.0f, 0.0));
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat3("u_DirLight.diffuse", m_DirLight.GetDiffuse());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat3("u_DirLight.specular", m_DirLight.GetSpecular());
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_LightSpaceMatrix", m_DirLight.GetLightSpaceMatrix());
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_DirLight.direction", glm::vec3(-1.0f, -1.0f, 0.0));
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_DirLight.diffuse", m_DirLight.GetDiffuse());
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_DirLight.specular", m_DirLight.GetSpecular());
 
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat3("u_Ambient", glm::vec3(0.5f, 0.3f, 0.2f));
-
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_Ambient", glm::vec3(0.5f, 0.3f, 0.2f));
 			m_Albedo->Bind();
-			skybox.GetCubeMap()->Bind();
-		}
-		//GameObject Rendering
-		for (auto gameObjectName : m_GameObjectsName)
-		{
-			auto gameObject = m_GameObjectLibrary.Get(gameObjectName);
 			if (gameObject->GetType() == "Cube")
 				std::dynamic_pointer_cast<Dragon::Cube>(gameObject)->Render();
 		}
@@ -134,6 +131,16 @@ public:
 		Dragon::RenderCommand::Clear();
 		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->Bind();
 		m_Framebuffer->BindColorTexture();
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformFloat("u_OppositionWeight", m_OppositionWeight);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformFloat("u_GrayWeight", m_GrayWeight);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformFloat("u_KernelWeight", m_KernelWeight);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformFloat("u_BlurWeight", m_BlurWeight);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformFloat("u_EdgeDetectionWeight", m_EdgeDetectionWeight);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformBool("u_Opposition", m_Opposition);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformBool("u_Gray", m_Gray);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformBool("u_Kernel", m_Kernel);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformBool("u_Blur", m_Blur);
+		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformBool("u_EdgeDetection", m_EdgeDetection);
 		screenQuad.Render();
 		Dragon::Renderer::EndScene();
 	}
@@ -151,6 +158,38 @@ public:
 		ImGui::Combo("", &m_ShaderListItem, shaderList, m_ShaderList.size());
 		ShaderGui(m_ShaderList[m_ShaderListItem]);
 
+		ImGui::NewLine();
+		ImGui::Text("Post Effect");
+		ImGui::Checkbox("Opposition", &m_Opposition);
+		if (m_Opposition)
+		{
+			ImGui::SameLine();
+			ImGui::SliderFloat("Opposition Weight", &m_OppositionWeight, 0.0f, 1.0f);
+		}
+		ImGui::Checkbox("Gray", &m_Gray);
+		if (m_Gray)
+		{
+			ImGui::SameLine();
+			ImGui::SliderFloat("Gray Weight", &m_GrayWeight, 0.0f, 1.0f);
+		}
+		ImGui::Checkbox("Kernel", &m_Kernel);
+		if (m_Kernel)
+		{
+			ImGui::SameLine();
+			ImGui::SliderFloat("Kernel Weight", &m_KernelWeight, 0.0f, 1.0);
+		}
+		ImGui::Checkbox("Blur", &m_Blur);
+		if (m_Blur)
+		{
+			ImGui::SameLine();
+			ImGui::SliderFloat("Blur Weight", &m_BlurWeight, 0.0f, 1.0f);
+		}
+		ImGui::Checkbox("Edge Detection", &m_EdgeDetection);
+		if (m_EdgeDetection)
+		{
+			ImGui::SameLine();
+			ImGui::SliderFloat("Edge Detection Weight", &m_EdgeDetectionWeight, 0.0f, 1.0f);
+		}
 
 		ImGui::End();
 
@@ -181,10 +220,6 @@ public:
 		ImGui::Begin("Outline View");
 		const char** GameObjectList = StringToChar(m_GameObjectsName);
 		ImGui::ListBox("", &m_GameObjectsItem, GameObjectList, m_GameObjectsName.size(), m_GameObjectsName.size());
-		ImGui::End();
-
-		ImGui::Begin("Console");
-		ImGui::TextColored(ImVec4(1.0, 1.0, 1.0, 1.0), "lalala");
 		ImGui::End();
 	}
 
@@ -280,6 +315,18 @@ private:
 		"SkyBox"
 	};
 	int m_ShaderListItem = 0;
+
+	// Post Effect Parameters
+	bool m_Opposition = false;
+	float m_OppositionWeight = 1.0f;
+	bool m_Gray = false;
+	float m_GrayWeight = 1.0f;
+	bool m_Kernel = false;
+	float m_KernelWeight = 1.0f;
+	bool m_Blur = false;
+	float m_BlurWeight = 1.0f;
+	bool m_EdgeDetection = false;
+	float m_EdgeDetectionWeight = 1.0f;
 
 	//Textures--------------------------------------
 	std::shared_ptr<Dragon::Texture2D> m_Albedo;

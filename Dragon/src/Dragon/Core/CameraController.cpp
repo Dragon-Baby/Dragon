@@ -29,6 +29,9 @@ namespace Dragon
 		dispatcher.Dispatch<WindowResizeEvent>(DG_BIND_EVENT_FN(CameraController::OnWindowResized));
 		dispatcher.Dispatch<MouseMovedEvent>(DG_BIND_EVENT_FN(CameraController::OnMouseMoved));
 		dispatcher.Dispatch<KeyPressedEvent>(DG_BIND_EVENT_FN(CameraController::OnKeyBoard));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(DG_BIND_EVENT_FN(CameraController::OnMouseClicked));
+		dispatcher.Dispatch<MouseButtonReleasedEvent>(DG_BIND_EVENT_FN(CameraController::OnMouseReleased));
+		dispatcher.Dispatch<KeyReleasedEvent>(DG_BIND_EVENT_FN(CameraController::OnKeyReleased));
 	}
 	bool CameraController::OnMouseScrolled(MouseScrolledEvent& e)
 	{
@@ -48,7 +51,43 @@ namespace Dragon
 	}
 	bool CameraController::OnMouseMoved(MouseMovedEvent& e)
 	{
-		if (m_Quit)
+		if (!m_Quit)
+		{
+			float xPos, yPos;
+			xPos = e.GetX();
+			yPos = e.GetY();
+			if (firstMouse)
+			{
+				lastX = xPos;
+				lastY = yPos;
+				firstMouse = false;
+			}
+
+			float xOffset = 0.0f;
+			float yOffset = 0.0f;
+			xOffset = (xPos - lastX) * m_MouseSensitivity;
+			yOffset = (lastY - yPos) * m_MouseSensitivity;
+			lastX = xPos;
+			lastY = yPos;
+			if (m_ALT)
+			{
+				if (m_MouseLeft)
+				{
+					m_Yaw += xOffset*5;
+					m_Pitch += yOffset*5;
+					if (m_Pitch > 89.0f)
+						m_Pitch = 89.0f;
+					if (m_Pitch < -89.0f)
+						m_Pitch = -89.0f;
+				}
+				if (m_MouseMiddle)
+				{
+					m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetRight() * (xOffset*20 * m_Timestep));
+					m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetUp() * (yOffset *20* m_Timestep));
+				}
+			}
+		}
+		else if (m_Quit)
 		{
 			float xPos, yPos;
 			xPos = e.GetX();
@@ -79,14 +118,17 @@ namespace Dragon
 
 	bool CameraController::OnKeyBoard(KeyPressedEvent& e)
 	{
-		if (e.GetKeyCode() == DG_KEY_A)
-			m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetRight() * (m_CameraTranslationSpeed * m_Timestep));
-		if (e.GetKeyCode() == DG_KEY_D)
-			m_Camera.SetPosition(m_Camera.GetPosition() + m_Camera.GetRight() * (m_CameraTranslationSpeed * m_Timestep));
-		if (e.GetKeyCode() == DG_KEY_W)
-			m_Camera.SetPosition(m_Camera.GetPosition() + m_Camera.GetFront() * (m_CameraTranslationSpeed * m_Timestep));
-		if (e.GetKeyCode() == DG_KEY_S)
-			m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetFront() * (m_CameraTranslationSpeed * m_Timestep));
+		if (m_Quit)
+		{
+			if (e.GetKeyCode() == DG_KEY_A)
+					m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetRight() * (m_CameraTranslationSpeed * m_Timestep));
+			if (e.GetKeyCode() == DG_KEY_D)
+				m_Camera.SetPosition(m_Camera.GetPosition() + m_Camera.GetRight() * (m_CameraTranslationSpeed * m_Timestep));
+			if (e.GetKeyCode() == DG_KEY_W)
+				m_Camera.SetPosition(m_Camera.GetPosition() + m_Camera.GetFront() * (m_CameraTranslationSpeed * m_Timestep));
+			if (e.GetKeyCode() == DG_KEY_S)
+				m_Camera.SetPosition(m_Camera.GetPosition() - m_Camera.GetFront() * (m_CameraTranslationSpeed * m_Timestep));
+		}
 		if (e.GetKeyCode() == DG_KEY_Q)
 		{
 			if (m_Quit)
@@ -100,6 +142,53 @@ namespace Dragon
 				m_Camera = m_LastCamera;
 				m_Quit = !m_Quit;
 			}
+		}
+		if (!m_Quit)
+		{
+			if (e.GetKeyCode() == DG_KEY_LEFT_CONTROL)
+				m_CTRL = true;
+			if (e.GetKeyCode() == DG_KEY_LEFT_ALT)
+				m_ALT = true;
+		}
+		return false;
+	}
+
+	bool CameraController::OnKeyReleased(KeyReleasedEvent& e)
+	{
+		if (!m_Quit)
+		{
+			if (e.GetKeyCode() == DG_KEY_LEFT_CONTROL)
+				m_CTRL = false;
+			if (e.GetKeyCode() == DG_KEY_LEFT_ALT)
+				m_ALT = false;
+		}
+		return false;
+	}
+
+	bool CameraController::OnMouseClicked(MouseButtonPressedEvent& e)
+	{
+		if (!m_Quit)
+		{
+			if (e.GetMouseButton() == DG_MOUSE_BUTTON_LEFT)
+				m_MouseLeft = true;
+			if (e.GetMouseButton() == DG_MOUSE_BUTTON_RIGHT)
+				m_MouseRight = true;
+			if (e.GetMouseButton() == DG_MOUSE_BUTTON_MIDDLE)
+				m_MouseMiddle = true;
+		}
+		return false;
+	}
+
+	bool CameraController::OnMouseReleased(MouseButtonReleasedEvent& e)
+	{
+		if (!m_Quit)
+		{
+			if (e.GetMouseButton() == DG_MOUSE_BUTTON_LEFT)
+				m_MouseLeft = false;
+			if (e.GetMouseButton() == DG_MOUSE_BUTTON_RIGHT)
+				m_MouseRight = false;
+			if (e.GetMouseButton() == DG_MOUSE_BUTTON_MIDDLE)
+				m_MouseMiddle = false;
 		}
 		return false;
 	}

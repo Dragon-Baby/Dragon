@@ -18,6 +18,16 @@ layout (location = 0) out vec4 f_Color;
 in vec2 v_TexCoords;
 
 uniform sampler2D u_ScreenTexture;
+uniform bool u_Opposition;
+uniform float u_OppositionWeight;
+uniform bool u_Gray;
+uniform float u_GrayWeight;
+uniform bool u_Kernel;
+uniform float u_KernelWeight;
+uniform bool u_Blur;
+uniform float u_BlurWeight;
+uniform bool u_EdgeDetection;
+uniform float u_EdgeDetectionWeight;
 
 //后期处理函数
 //反相
@@ -39,22 +49,27 @@ void main()
 {
 	vec3 screenColor = texture(u_ScreenTexture, v_TexCoords).rgb;
 	f_Color = vec4(screenColor, 1.0);
-	//f_Color = vec4(Opposition(screenColor), 1.0);
-	//f_Color = vec4(Gray(screenColor),1.0);
-	//f_Color = vec4(Kernel(u_ScreenTexture, v_TexCoords), 1.0);
-	//f_Color = vec4(Blur(u_ScreenTexture, v_TexCoords), 1.0);
-	//f_Color = vec4(EdgeDetection(u_ScreenTexture, v_TexCoords), 1.0);
+	if(u_Opposition)
+		f_Color *= vec4(Opposition(screenColor), 1.0);
+	if(u_Gray)
+		f_Color *= vec4(Gray(screenColor),1.0);
+	if(u_Kernel)
+		f_Color *= vec4(Kernel(u_ScreenTexture, v_TexCoords), 1.0);
+	if(u_Blur)
+		f_Color *= vec4(Blur(u_ScreenTexture, v_TexCoords), 1.0);
+	if(u_EdgeDetection)
+		f_Color *= vec4(EdgeDetection(u_ScreenTexture, v_TexCoords), 1.0);
 }
 
 vec3 Opposition(vec3 color)
 {
-	return vec3(1.0 - color);
+	return vec3(1.0 - color)*u_OppositionWeight;
 }
 
 vec3 Gray(vec3 color)
 {
 	float average = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
-	return vec3(average, average, average);
+	return vec3(average, average, average)*u_GrayWeight;
 }
 
 vec3 Kernel(sampler2D screenTexture, vec2 texCoords)
@@ -95,7 +110,7 @@ vec3 Kernel(sampler2D screenTexture, vec2 texCoords)
 		color += sampleTex[i] * kernel[i];
 	}
 
-	return color;
+	return color*u_KernelWeight;
 }
 
 vec3 Blur(sampler2D screenTexture, vec2 texCoords)
@@ -136,7 +151,7 @@ vec3 Blur(sampler2D screenTexture, vec2 texCoords)
 		color += sampleTex[i] * kernel[i];
 	}
 
-	return color;
+	return color*u_BlurWeight;
 }
 
 vec3 EdgeDetection(sampler2D screenTexture, vec2 texCoords)
@@ -177,5 +192,5 @@ vec3 EdgeDetection(sampler2D screenTexture, vec2 texCoords)
 		color += sampleTex[i] * kernel[i];
 	}
 
-	return color;
+	return color*u_EdgeDetectionWeight;
 }

@@ -23,6 +23,7 @@ namespace Dragon
 	{
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
+		SetShaderParameter(source);
 		Compile(shaderSources);
 
 		//»ñÈ¡Ãû×Ö
@@ -87,6 +88,27 @@ namespace Dragon
 		}
 
 		return shaderSources;
+	}
+
+	void OpenGLShader::SetShaderParameter(const std::string& source)
+	{
+		const char* uniformToken = "uniform";
+		size_t uniformTokenLength = strlen(uniformToken);
+		size_t pos = source.find(uniformToken, 0);
+		while (pos != std::string::npos)
+		{
+			size_t semicolon = source.find_first_of(";", pos);
+			DG_CORE_ASSERT(semicolon != std::string::npos, "Syntax error");
+			size_t begin = pos + uniformTokenLength + 1;
+			size_t middleBackspace = source.find_first_of(" ", begin);
+			std::string type = source.substr(begin, middleBackspace - begin);
+			std::string name = source.substr(middleBackspace, semicolon - middleBackspace);
+			m_ShaderParameters[type] = name;
+			size_t eol = source.find_first_of("\r\n", semicolon);
+			DG_CORE_ASSERT(eol != std::string::npos, "Syntax error");
+			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
+			pos = source.find(uniformToken, nextLinePos);
+		}
 	}
 
 	void OpenGLShader::Compile(const std::unordered_map<unsigned int, std::string>& shaderSources)
@@ -168,7 +190,11 @@ namespace Dragon
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		glUniform1i(location, value);
 	}
-
+	void OpenGLShader::UploadUniformBool(const std::string& name, bool value)
+	{
+		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
+		glUniform1i(location, value);
+	}
 	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
 	{
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());

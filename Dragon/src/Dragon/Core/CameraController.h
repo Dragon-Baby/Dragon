@@ -27,6 +27,9 @@ namespace Dragon
 		bool OnWindowResized(WindowResizeEvent& e);
 		bool OnMouseMoved(MouseMovedEvent& e);
 		bool OnKeyBoard(KeyPressedEvent& e);
+		bool OnKeyReleased(KeyReleasedEvent& e);
+		bool OnMouseClicked(MouseButtonPressedEvent& e);
+		bool OnMouseReleased(MouseButtonReleasedEvent& e);
 		void UpdateCameraVectors();
 	private:
 		Camera m_Camera;
@@ -43,5 +46,10 @@ namespace Dragon
 		Timestep m_Timestep;
 
 		bool m_Quit = true;
+		bool m_CTRL = false;
+		bool m_ALT = false;
+		bool m_MouseLeft = false;
+		bool m_MouseRight = false;
+		bool m_MouseMiddle = false;
 	};
 }
