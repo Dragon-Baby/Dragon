@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Dragon/Renderer/Shader.h"
+#include "Dragon/Renderer/Camera.h"
+#include "Build_in/GameObjects.h"
+#include "Dragon/Renderer/Texture.h"
+#include "Platform/OpenGL/OpenGLTexture.h"
 #include <glm/glm.hpp>
 
 namespace Dragon
@@ -26,16 +30,25 @@ namespace Dragon
 
 		void UploadUniformMat3(const std::string& name, const glm::mat3& matrix);
 		void UploadUniformMat4(const std::string& name, const glm::mat4& matrix);
+		std::map<std::string, std::vector<std::string>>& GetShaderParameterName() { return m_ShaderParametersName; };
+		std::map<std::string, std::map<std::string, std::any>>& CreateParameter();
+		std::map<std::string, std::map<std::string, std::any>>& GetParameter() { return m_ParametersToCreate; }
+		void SetParameter(std::string& gameObjectName, GameObjectLibrary& gameObjectLibrary, Camera& camera, DirLight& dirLight, std::vector<PointLight>& pointLights);
+		void UploadAllUniformParameter();
 	private:
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<unsigned int, std::string> PreProcess(const std::string& source);
-		void SetShaderParameter(const std::string& source);
-		std::map<std::string, std::string>& GetShaderParameter() { return m_ShaderParameters; };
+		void SetShaderParameterName(const std::string& source);
 		void Compile(const std::unordered_map<unsigned int, std::string>& shaderSources);
+		void ShaderParameterMapInit();
 	private:
 		uint32_t m_RendererID;
-	
+		GameObjectLibrary m_GameObjectLibrary;
 		std::string m_Name;
-		std::map<std::string, std::string> m_ShaderParameters;
+		std::map<std::string, std::vector<std::string>> m_ShaderParametersName;
+
+		std::map<std::string, std::map<std::string, std::any>> m_ParametersToCreate;
+
+		bool m_FirstCreated = false;
 	};
 }

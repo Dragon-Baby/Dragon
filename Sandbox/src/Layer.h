@@ -49,9 +49,9 @@ public:
 		std::dynamic_pointer_cast<Dragon::OpenGLShader>(screenQuadShader)->UploadUniformInt("u_ScreenTexture", 0);
 
 		//cube init
-		m_Albedo = Dragon::Texture2D::Create("assets/textures/wall.jpg");
+		m_Albedo = Dragon::Texture2D::Create("assets/textures/default.png");
 		m_Albedo->Bind();
-		//skybox.GetCubeMap()->Bind();
+		skybox.GetCubeMap()->Bind();
 		glEnable(GL_MULTISAMPLE);
 	}
 
@@ -88,26 +88,9 @@ public:
 				std::dynamic_pointer_cast<Dragon::Cube>(gameObject)->Init();
 			
 			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->Bind();
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformInt("u_Albedo", 0);
-			//std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformInt("u_SkyBox", 0);
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformInt("u_ShadowMap", 1);
-			//CameraPos
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_CameraPos", m_CameraController.GetCamera().GetPosition());
-			//Material
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat("u_Shininess", 32.0f);
-			//std::dynamic_pointer_cast<Dragon::OpenGLShader>(cubeShader)->UploadUniformFloat3("u_Albedo", glm::vec3(0.5f, 0.3f, 0.2f));
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat("u_Specular", 0.5f);
-			//MVP
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_Model", gameObject->GetModel());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_Projection", m_CameraController.GetCamera().GetProjectionMatrix());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_View", m_CameraController.GetCamera().GetViewMatrix());
-			//dir light
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformMat4("u_LightSpaceMatrix", m_DirLight.GetLightSpaceMatrix());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_DirLight.direction", glm::vec3(-1.0f, -1.0f, 0.0));
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_DirLight.diffuse", m_DirLight.GetDiffuse());
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_DirLight.specular", m_DirLight.GetSpecular());
-
-			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadUniformFloat3("u_Ambient", glm::vec3(0.5f, 0.3f, 0.2f));
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->SetParameter(gameObjectName, m_GameObjectLibrary, m_CameraController.GetCamera(), m_DirLight, m_PointLights);
+			m_ShaderParameters = std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->GetParameter();
+			std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->UploadAllUniformParameter();
 			m_Albedo->Bind();
 			if (gameObject->GetType() == "Cube")
 				std::dynamic_pointer_cast<Dragon::Cube>(gameObject)->Render();
@@ -151,7 +134,6 @@ public:
 		if(m_GameObjectsName.size()!=0)
 			GameObjectGui(m_GameObjectsName[m_GameObjectsItem]);
 		ImGui::NewLine();
-
 		ImGui::Text("Shader List");
 		
 		const char** shaderList = StringToChar(m_ShaderList);
@@ -191,6 +173,7 @@ public:
 			ImGui::SliderFloat("Edge Detection Weight", &m_EdgeDetectionWeight, 0.0f, 1.0f);
 		}
 
+
 		ImGui::End();
 
 		ImGui::Begin("Game Object");
@@ -228,6 +211,10 @@ public:
 		m_CameraController.OnEvent(event);
 	}
 private:
+	std::string OpenFileDialog(bool isOpen)
+	{
+		
+	}
 	void ShaderGui(std::string shaderName)
 	{
 		ImGui::NewLine();
@@ -243,7 +230,7 @@ private:
 			ImGui::NewLine();
 			ImGui::Text("Diffuse");
 			ImGui::SameLine();
-			testImage = Dragon::Texture2D::Create("assets/textures/wall.jpg");
+			testImage = Dragon::Texture2D::Create("assets/textures/default.png");
 			ImGui::ImageButton((ImTextureID)(intptr_t)testImage->GetTextureID(), ImVec2(100, 100));
 		}
 	}
@@ -261,6 +248,59 @@ private:
 		gameObject->SetPosition(glm::vec3(position[0], position[1], position[2]));
 		gameObject->SetRotation(glm::vec3(rotation[0], rotation[1], rotation[2]));
 		gameObject->SetScale(glm::vec3(scale[0], scale[1], scale[2]));
+		//std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->CreateParameter();
+		ImGui::Text("Shader Parameters");
+		for (auto& kv : std::dynamic_pointer_cast<Dragon::OpenGLShader>(gameObject->GetShader())->GetParameter())
+		{
+			if (kv.first == "float")
+			{
+				for (auto& np : kv.second)
+				{
+					ImGui::SliderFloat(ErasePrefix("u_", np.first).c_str(), std::any_cast<float>(&np.second),0.0f, 1.0f);
+				}
+			}
+			else if (kv.first == "int")
+			{
+				for (auto& np : kv.second)
+				{
+					ImGui::SliderInt(ErasePrefix("u_", np.first).c_str(), std::any_cast<int>(&np.second), 0, 10);
+				}
+			}
+			else if (kv.first == "vec2")
+			{
+				for (auto& np : kv.second)
+				{
+					ImGui::SliderFloat2(ErasePrefix("u_", np.first).c_str(), (float*)glm::value_ptr(std::any_cast<glm::vec2>(np.second)),0.0f, 1.0f);
+				}
+			}
+			else if (kv.first == "vec3")
+			{
+				for (auto& np : kv.second)
+				{
+					if (np.first != "u_CameraPos")
+					{
+						ImGui::SliderFloat3(ErasePrefix("u_", np.first).c_str(), (float*)glm::value_ptr(std::any_cast<glm::vec3>(np.second)), 0.0f, 1.0f);
+					}
+				}
+			}
+			else if (kv.first == "vec4")
+			{
+				for (auto& np : kv.second)
+				{
+					ImGui::SliderFloat4(ErasePrefix("u_", np.first).c_str(), (float*)glm::value_ptr(std::any_cast<glm::vec4>(np.second)), 0.0f, 1.0f);
+				}
+			}
+			else if (kv.first == "bool")
+			{
+				for (auto& np : kv.second)
+				{
+					ImGui::Checkbox(ErasePrefix("u_", np.first).c_str(), std::any_cast<bool>(&np.second));
+				}
+			}
+		}
+		testImage = Dragon::Texture2D::Create("assets/textures/default.png");
+		bool isOpen = ImGui::ImageButton((ImTextureID)(intptr_t)testImage->GetTextureID(), ImVec2(100, 100));
+		OpenFileDialog(isOpen);
 	}
 
 	void ButtonClicked()
@@ -292,6 +332,15 @@ private:
 
 		return list;
 	}
+
+	std::string ErasePrefix(std::string prefix, std::string toErasePrefix)
+	{
+		size_t prefixPos = toErasePrefix.find(prefix);
+		if (prefixPos != std::string::npos)
+		{
+			return toErasePrefix.erase(prefixPos, prefix.size());
+		}
+	}
 private:
 	//Framebuffer
 	std::shared_ptr<Dragon::Framebuffer> m_Framebuffer;
@@ -315,6 +364,8 @@ private:
 		"SkyBox"
 	};
 	int m_ShaderListItem = 0;
+
+	std::map<std::string, std::map<std::string, std::any>> m_ShaderParameters;
 
 	// Post Effect Parameters
 	bool m_Opposition = false;

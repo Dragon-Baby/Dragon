@@ -1,6 +1,8 @@
 #include "dgpch.h"
 #include "OpenGLShader.h"
 
+#include "Build_in/GameObjects.h"
+
 #include <fstream>
 #include <glad/glad.h>
 
@@ -23,7 +25,9 @@ namespace Dragon
 	{
 		std::string source = ReadFile(filepath);
 		auto shaderSources = PreProcess(source);
-		SetShaderParameter(source);
+		ShaderParameterMapInit();
+		SetShaderParameterName(source);
+		CreateParameter();
 		Compile(shaderSources);
 
 		//»ñÈ¡Ãû×Ö
@@ -90,7 +94,7 @@ namespace Dragon
 		return shaderSources;
 	}
 
-	void OpenGLShader::SetShaderParameter(const std::string& source)
+	void OpenGLShader::SetShaderParameterName(const std::string& source)
 	{
 		const char* uniformToken = "uniform";
 		size_t uniformTokenLength = strlen(uniformToken);
@@ -102,14 +106,321 @@ namespace Dragon
 			size_t begin = pos + uniformTokenLength + 1;
 			size_t middleBackspace = source.find_first_of(" ", begin);
 			std::string type = source.substr(begin, middleBackspace - begin);
-			std::string name = source.substr(middleBackspace, semicolon - middleBackspace);
-			m_ShaderParameters[type] = name;
+			if (type.find(" ") != std::string::npos)
+				DG_CORE_ERROR("There's blank in {0}", type);
+			std::string name = source.substr(middleBackspace+1, semicolon - middleBackspace-1);
+			if (name.find(" ") != std::string::npos)
+				DG_CORE_ERROR("There's blank in {0}", name);
+			if (name.find_first_of("[",middleBackspace+1) != std::string::npos)
+			{
+				size_t bracket = name.find_first_of("[",middleBackspace+1);
+				name = name.substr(middleBackspace+1, bracket);
+			}
+			m_ShaderParametersName[type].push_back(name);
 			size_t eol = source.find_first_of("\r\n", semicolon);
 			DG_CORE_ASSERT(eol != std::string::npos, "Syntax error");
 			size_t nextLinePos = source.find_first_not_of("\r\n", eol);
 			pos = source.find(uniformToken, nextLinePos);
 		}
 	}
+
+	std::map<std::string, std::map<std::string, std::any>>& OpenGLShader::CreateParameter()
+	{
+		std::map<std::string, std::any> init = {};
+		m_ParametersToCreate["float"] = init;
+		m_ParametersToCreate["double"] = init;
+		m_ParametersToCreate["int"] = init;
+		m_ParametersToCreate["bool"] = init;
+		m_ParametersToCreate["vec2"] = init;
+		m_ParametersToCreate["vec3"] = init;
+		m_ParametersToCreate["vec4"] = init;
+		m_ParametersToCreate["mat2"] = init;
+		m_ParametersToCreate["mat3"] = init;
+		m_ParametersToCreate["mat4"] = init;
+		m_ParametersToCreate["sampler2D"] = init;
+		m_ParametersToCreate["samplerCube"] = init;
+		m_ParametersToCreate["DirLight"] = init;
+		m_ParametersToCreate["PointLight"] = init;
+		int textureID = 0;
+		for (auto kv : m_ShaderParametersName)
+		{
+			if (kv.first == "float")
+			{
+				for (auto v : kv.second)
+				{
+					float parameter = 0.0f;
+					m_ParametersToCreate["float"][v].emplace<float>(parameter);
+				}
+
+			}
+			else if (kv.first == "double")
+			{
+				for (auto v : kv.second)
+				{
+					double parameter = 0.0;
+					m_ParametersToCreate["double"][v].emplace<double>(parameter);
+				}
+			}
+			else if (kv.first == "int")
+			{
+				for (auto v : kv.second)
+				{
+					int parameter = 0;
+					m_ParametersToCreate["int"][v].emplace<int>(parameter);
+				}
+			}
+			else if (kv.first == "bool")
+			{
+				for (auto v : kv.second)
+				{
+					bool parameter = 0;
+					m_ParametersToCreate["bool"][v].emplace<bool>(parameter);
+				}
+			}
+			else if (kv.first == "vec2")
+			{
+				for (auto v : kv.second)
+				{
+					glm::vec2 parameter = glm::vec2(0.0f);
+					m_ParametersToCreate["vec2"][v].emplace<glm::vec2>(parameter);
+				}
+			}
+			else if (kv.first == "vec3")
+			{
+				for (auto v : kv.second)
+				{
+					glm::vec3 parameter = glm::vec3(0.0f);
+					m_ParametersToCreate["vec3"][v].emplace<glm::vec3>(parameter);
+				}
+			}
+			else if (kv.first == "vec4")
+			{
+				for (auto v : kv.second)
+				{
+					glm::vec4 parameter = glm::vec4(0.0f);
+					m_ParametersToCreate["vec4"][v].emplace<glm::vec4>(parameter);
+				}
+			}
+			else if (kv.first == "mat2")
+			{
+				for (auto v : kv.second)
+				{
+					glm::mat2 parameter = glm::mat2(0.0f);
+					m_ParametersToCreate["mat2"][v].emplace<glm::mat2>(parameter);
+				}
+			}
+			else if (kv.first == "mat3")
+			{
+				for (auto v : kv.second)
+				{
+					glm::mat3 parameter = glm::mat3(0.0f);
+					m_ParametersToCreate["mat3"][v].emplace<glm::mat3>(parameter);
+				}
+			}
+			else if (kv.first == "mat4")
+			{
+				for (auto v : kv.second)
+				{
+					glm::mat4 parameter = glm::mat4(1.0f);
+					m_ParametersToCreate["mat4"][v].emplace<glm::mat4>(parameter);
+				}
+			}
+			else if (kv.first == "sampler2D")
+			{
+				for (auto v : kv.second)
+				{
+					m_ParametersToCreate["sampler2D"][v].emplace<int>(textureID);
+					textureID++;
+				}
+			}
+			else if (kv.first == "samplerCube")
+			{
+				for (auto v : kv.second)
+				{
+					m_ParametersToCreate["samplerCube"][v].emplace<int>(textureID);
+					textureID++;
+				}
+			}
+			else if (kv.first == "DirLight")
+			{
+				for (auto v : kv.second)
+				{
+					std::shared_ptr<DirLight> parameter;
+					m_ParametersToCreate["DirLight"][v].emplace<std::shared_ptr<DirLight>>(parameter);
+				}
+			}
+			else if (kv.first == "PointLight")
+			{
+				for (auto v : kv.second)
+				{
+					std::vector<std::shared_ptr<PointLight>> parameter;
+					m_ParametersToCreate["PointLight"][v].emplace<std::vector<std::shared_ptr<PointLight>>>(parameter);
+				}
+			}
+		}
+		return m_ParametersToCreate;
+	}
+
+	void OpenGLShader::SetParameter(std::string& gameObjectName, GameObjectLibrary& gameObjectLibrary, Camera& camera, DirLight& dirLight, std::vector<PointLight>& pointLights)
+	{
+		auto gameObject = gameObjectLibrary.Get(gameObjectName);
+		for (auto& kv : m_ParametersToCreate)
+		{
+			if (kv.first == "mat4")
+			{
+				for (auto& np : kv.second)
+				{
+					if (np.first == "u_Model")
+						np.second = gameObject->GetModel();
+					else if (np.first == "u_View")
+						np.second = camera.GetViewMatrix();
+					else if (np.first == "u_Projection")
+						np.second = camera.GetProjectionMatrix();
+				}
+			}
+			else if (kv.first == "vec3")
+			{
+				for (auto& np : kv.second)
+				{
+					if (np.first == "u_CameraPos")
+					{
+						np.second.emplace<glm::vec3>(camera.GetPosition());
+						/*for (int i = 0; i < 3; i++)
+						{
+							DG_CORE_TRACE("{0}:{1}", np.first, glm::value_ptr(std::any_cast<glm::vec3>(np.second))[i]);
+						}*/
+					}
+					else if (np.first == "u_LightDir")
+					{
+						np.second.emplace<glm::vec3>(dirLight.GetDirection());
+						/*for (int i = 0; i < 3; i++)
+						{
+							DG_CORE_TRACE("{0}:{1}", np.first, glm::value_ptr(std::any_cast<glm::vec3>(np.second))[i]);
+						}*/
+					}
+				}
+			}
+			else if (kv.first == "DirLight")
+			{
+				for (auto& np : kv.second)
+				{
+					np.second.emplace<DirLight>(dirLight);
+				}
+			}
+			else if (kv.first == "PointLight")
+			{
+				for (auto& np : kv.second)
+				{
+					np.second.emplace<std::vector<PointLight>>(pointLights);
+				}
+			}
+		}
+	}
+
+	void OpenGLShader::UploadAllUniformParameter()
+	{
+		for (auto kv : m_ParametersToCreate)
+		{
+			if (kv.first == "float")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformFloat(np.first, std::any_cast<float>(np.second));
+				}
+			}
+			else if (kv.first == "int")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformInt(np.first, std::any_cast<int>(np.second));
+				}
+			}
+			else if (kv.first == "bool")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformBool(np.first, std::any_cast<bool>(np.second));
+				}
+			}
+			else if (kv.first == "vec2")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformFloat2(np.first, std::any_cast<glm::vec2>(np.second));
+				}
+			}
+			else if (kv.first == "vec3")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformFloat3(np.first, std::any_cast<glm::vec3>(np.second));
+				}
+			}
+			else if (kv.first == "vec4")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformFloat4(np.first, std::any_cast<glm::vec4>(np.second));
+				}
+			}
+			else if (kv.first == "mat3")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformMat3(np.first, std::any_cast<glm::mat3>(np.second));
+				}
+			}
+			else if (kv.first == "mat4")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformMat4(np.first, std::any_cast<glm::mat4>(np.second));
+				}
+			}
+			else if (kv.first == "sampler2D")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformInt(np.first, std::any_cast<int>(np.second));
+					//DG_CORE_TRACE("{0}:{1}", np.first, std::any_cast<int>(np.second));
+				}
+			}
+			else if (kv.first == "samplerCube")
+			{
+				for (auto np : kv.second)
+				{
+					UploadUniformInt(np.first, std::any_cast<int>(np.second));
+				}
+			}
+			else if (kv.first == "DirLight")
+			{
+				for (auto np : kv.second)
+				{
+					DG_CORE_INFO("DirLight Yes");
+					UploadUniformFloat3(np.first+".direction", std::any_cast<DirLight>(np.second).GetDirection());
+					UploadUniformFloat3(np.first + ".diffuse", std::any_cast<DirLight>(np.second).GetDiffuse());
+					UploadUniformFloat3(np.first + ".specular", std::any_cast<DirLight>(np.second).GetSpecular());
+				}
+			}
+			else if (kv.first == "PointLight")
+			{
+				int index = 0;
+				for (auto np : kv.second)
+				{
+					for (auto light : std::any_cast<std::vector<PointLight>>(np.second))
+					{
+						UploadUniformFloat3(np.first + "[ " + std::to_string(index) + "].position", light.GetPosition());
+						UploadUniformFloat3(np.first + "[" + std::to_string(index) + "].diffuse", light.GetDiffuse());
+						UploadUniformFloat3(np.first + "[" + std::to_string(index) + "].specular", light.GetSpecular());
+						UploadUniformFloat3(np.first + "[" + std::to_string(index) + "].attenuation", light.GetAttenuation());
+						index++;
+					}
+				}
+			}
+		}
+	}
+
+
 
 	void OpenGLShader::Compile(const std::unordered_map<unsigned int, std::string>& shaderSources)
 	{
@@ -173,6 +484,25 @@ namespace Dragon
 		}
 		for (auto id : glShaderIDs)
 			glDetachShader(program, id);
+	}
+
+	void OpenGLShader::ShaderParameterMapInit()
+	{
+		std::vector<std::string> init = {};
+		m_ShaderParametersName["float"] = init;
+		m_ShaderParametersName["double"] = init;
+		m_ShaderParametersName["int"] = init;
+		m_ShaderParametersName["bool"] = init;
+		m_ShaderParametersName["vec2"] = init;
+		m_ShaderParametersName["vec3"] = init;
+		m_ShaderParametersName["vec4"] = init;
+		m_ShaderParametersName["mat2"] = init;
+		m_ShaderParametersName["mat3"] = init;
+		m_ShaderParametersName["mat4"] = init;
+		m_ShaderParametersName["sampler2D"] = init;
+		m_ShaderParametersName["samplerCube"] = init;
+		m_ShaderParametersName["DirLight"] = init;
+		m_ShaderParametersName["PointLight"] = init;
 	}
 
 	void OpenGLShader::Bind() const
